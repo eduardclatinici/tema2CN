@@ -1,10 +1,11 @@
 import java.util.*;
 
 import Jama.*;
+import javafx.util.*;
 
 public class Main {
 
-    private static final int N = 7;
+    private static final int N = 5;
     private static final int INTEGER_NUMBER = 2;
     private static final int DECIMAL_NUMBER = 5;
 
@@ -18,13 +19,19 @@ public class Main {
         Provider provider = new Provider(N, INTEGER_NUMBER, DECIMAL_NUMBER);
         Matrix initialMatrix = provider.getRandomMatrix();
         List<Double> initialArray = provider.getRandomArray();
+        Pair<Matrix, List<Double>> transformed;
+        List<Double> solutions;
+
         System.out.println("initial system: ");
-        Printer.printSystem(initialMatrix,initialArray,INTEGER_NUMBER, DECIMAL_NUMBER);
+        Printer.printSystem(initialMatrix.copy(),initialArray,INTEGER_NUMBER, DECIMAL_NUMBER);
         System.out.println();
 
-        Gauss gauss = new Gauss(initialMatrix, initialArray, INTEGER_NUMBER, DECIMAL_NUMBER);
+        Gauss gauss = new Gauss(initialMatrix.copy(), initialArray, INTEGER_NUMBER, DECIMAL_NUMBER);
         try {
-            gauss.transformMatrixAndArray();
+            transformed = gauss.transformMatrixAndArray();
+            InverseSubstitution inverseSubstitution = new InverseSubstitution(transformed.getKey(),transformed.getValue());
+            solutions = inverseSubstitution.getSolution();
+            Utils.printSolution(initialMatrix.copy(),initialArray,solutions,DECIMAL_NUMBER, INTEGER_NUMBER);
         } catch (Exception e) {
             e.printStackTrace();
         }

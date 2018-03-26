@@ -22,25 +22,26 @@ public class Gauss {
         this.decimalNr = decimalNumber;
     }
 
-    public void transformMatrixAndArray() throws Exception {
+    public Pair<Matrix, List<Double>> transformMatrixAndArray() throws Exception {
         Pair<Matrix, List<Double>> pivoted; double element;
-        Matrix pivotedMatrix = matrix;
-        List<Double> pivotedArray = array;
+        Matrix transformedMatrix = matrix;
+        List<Double> transformedArray = array;
         for (int l = 0; l < n - 1; l++) {
-            pivoted = Utils.getPivotedSystem(pivotedMatrix, pivotedArray, l);
-            pivotedMatrix = pivoted.getKey();
-            pivotedArray = pivoted.getValue();
+            pivoted = Utils.getPivotedSystem(transformedMatrix, transformedArray, l);
+            transformedMatrix = pivoted.getKey();
+            transformedArray = pivoted.getValue();
             for (int i = l + 1; i < n; i++){
-                element = pivotedMatrix.get(i,l)/pivotedMatrix.get(l,l);
+                element = transformedMatrix.get(i,l)/transformedMatrix.get(l,l);
                 for (int j = l + 1; j < n; j++){
-                    pivotedMatrix.set(i,j,pivotedMatrix.get(i,j)-(element*pivotedMatrix.get(l,j)));
+                    transformedMatrix.set(i,j,transformedMatrix.get(i,j)-(element*transformedMatrix.get(l,j)));
                 }
-                pivotedArray.set(i,pivotedArray.get(i)-(element*pivotedArray.get(l)));
-                pivotedMatrix.set(i,l,0.0);
+                transformedArray.set(i,transformedArray.get(i)-(element*transformedArray.get(l)));
+                transformedMatrix.set(i,l,0.0);
             }
         }
         System.out.println("After Gauss:");
-        Printer.printSystem(pivotedMatrix,pivotedArray,integerNr,decimalNr);
+        Printer.printSystem(transformedMatrix,transformedArray,integerNr,decimalNr);
+        return new Pair<>(transformedMatrix,transformedArray);
     }
 
     void transform(int linei, int linel, double value) {

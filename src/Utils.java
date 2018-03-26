@@ -1,5 +1,7 @@
 import static java.lang.Math.*;
 
+import java.math.*;
+import java.text.*;
 import java.util.*;
 
 import Jama.*;
@@ -11,9 +13,10 @@ public class Utils {
         return matrix.det();
     }
 
-    public static Pair<Matrix, List<Double>> getPivotedSystem(Matrix matrix, List<Double> array, int linel) throws Exception {
+    public static Pair<Matrix, List<Double>> getPivotedSystem(Matrix matrix, List<Double> array,
+                                                              int linel) throws Exception {
         int pivotLine = getPivotLine(matrix, linel);
-        if(matrix.get(pivotLine,linel)==0.0)
+        if (matrix.get(pivotLine, linel) == 0.0)
             throw new Exception("Matrix is singular");
         Matrix pivotedMatrix = switchMatrixLines(matrix, pivotLine, linel, matrix.getRowDimension());
         List<Double> pivotedArray = switchArrayValues(array, pivotLine, linel);
@@ -79,6 +82,30 @@ public class Utils {
                 newArray.add(array.get(i));
         }
         return newArray;
+    }
+
+    public static void printSolution(Matrix initialMatrix, List<Double> initialArray, List<Double> solutions, int decimalNr, int integerNr) {
+        List<BigDecimal> solvedMatrix = new ArrayList<>(); double sum;
+        for (int i = 0; i < initialArray.size(); i++) {
+            sum=0;
+            for (int j = 0; j < initialArray.size(); j++) {
+                sum += trimDecimalNumber(decimalNr,initialMatrix.get(i,j)*trimDecimalNumber(decimalNr,solutions.get(j)));
+            }
+            sum=trimDecimalNumber(decimalNr,sum);
+            BigDecimal bigDecimal= new BigDecimal(sum-initialArray.get(i)).setScale(decimalNr+integerNr,BigDecimal.ROUND_DOWN);
+            solvedMatrix.add(bigDecimal);
+        }
+        for(BigDecimal d : solvedMatrix){
+            System.out.print(d+" ");
+        }
+    }
+
+    private static double trimDecimalNumber(int decimalNr, double value) {
+        StringBuilder format = new StringBuilder();
+        format.append("#.");
+        for (int i = 0; i < decimalNr; i++)
+            format.append("#");
+        return Double.parseDouble(new DecimalFormat(format.toString()).format(value));
     }
 
 }
