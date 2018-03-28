@@ -19,6 +19,14 @@ public class Printer {
         }
     }
 
+    public static void printMatrix(Matrix matrix, int decimalNr){
+        for(int i = 0 ; i < matrix.getRowDimension(); i++) {
+            for (int j = 0; j < matrix.getColumnDimension(); j++)
+                System.out.print(trimDecimalNumber(decimalNr,matrix.get(i, j))+"       ");
+            System.out.println();
+        }
+    }
+
     private static void printElement(double value, int integerNr, int decimalNr){
         int sum = integerNr+decimalNr+1, length = String.valueOf(value).length();
         StringBuilder spaces = new StringBuilder();

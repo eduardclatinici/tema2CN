@@ -22,6 +22,8 @@ public class Main {
         Pair<Matrix, List<Double>> transformed;
         List<Double> solutions;
 
+        System.out.println("matrix inverse: ");
+        Printer.printMatrix(initialMatrix.copy().inverse(),DECIMAL_NUMBER);
         System.out.println("initial system: ");
         Printer.printSystem(initialMatrix.copy(),initialArray,INTEGER_NUMBER, DECIMAL_NUMBER);
         System.out.println();
@@ -31,7 +33,10 @@ public class Main {
             transformed = gauss.transformMatrixAndArray();
             InverseSubstitution inverseSubstitution = new InverseSubstitution(transformed.getKey(),transformed.getValue());
             solutions = inverseSubstitution.getSolution();
-            Utils.printSolution(initialMatrix.copy(),initialArray,solutions,DECIMAL_NUMBER, INTEGER_NUMBER);
+            Utils.printSolution(initialMatrix.copy(),initialArray,solutions,DECIMAL_NUMBER, INTEGER_NUMBER,true);
+            Matrix solutionsLib = Utils.calculateSolLib(initialMatrix, initialArray);
+            Utils.calculateSecondNorm(solutionsLib,solutions,DECIMAL_NUMBER);
+            Utils.printSolution(initialMatrix.copy().inverse(),initialArray,solutions,DECIMAL_NUMBER,INTEGER_NUMBER,false);
         } catch (Exception e) {
             e.printStackTrace();
         }

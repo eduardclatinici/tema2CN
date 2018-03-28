@@ -84,20 +84,39 @@ public class Utils {
         return newArray;
     }
 
-    public static void printSolution(Matrix initialMatrix, List<Double> initialArray, List<Double> solutions, int decimalNr, int integerNr) {
-        List<BigDecimal> solvedMatrix = new ArrayList<>(); double sum;
+    public static void printSolution(Matrix initialMatrix, List<Double> initialArray, List<Double> solutions,
+                                     int decimalNr, int integerNr, boolean flag) {
+        List<BigDecimal> solvedMatrix = new ArrayList<>();
+        double sum;
         for (int i = 0; i < initialArray.size(); i++) {
-            sum=0;
+            sum = 0;
             for (int j = 0; j < initialArray.size(); j++) {
-                sum += trimDecimalNumber(decimalNr,initialMatrix.get(i,j)*trimDecimalNumber(decimalNr,solutions.get(j)));
+                sum += trimDecimalNumber(decimalNr,
+                        initialMatrix.get(i, j) * trimDecimalNumber(decimalNr, solutions.get(j)));
             }
-            sum=trimDecimalNumber(decimalNr,sum);
-            BigDecimal bigDecimal= new BigDecimal(sum-initialArray.get(i)).setScale(decimalNr+integerNr,BigDecimal.ROUND_DOWN);
+            sum = trimDecimalNumber(decimalNr, sum);
+            BigDecimal bigDecimal = new BigDecimal(sum - initialArray.get(i)).setScale(decimalNr,
+                    BigDecimal.ROUND_DOWN);
             solvedMatrix.add(bigDecimal);
         }
-        for(BigDecimal d : solvedMatrix){
-            System.out.print(d+" ");
+        if (flag) {
+            for (BigDecimal d : solvedMatrix) {
+                System.out.print(d + " ");
+            }
+            System.out.println();
         }
+        printSolutionNorm(solvedMatrix, decimalNr, integerNr, flag);
+    }
+
+    public static void printSolutionNorm(List<BigDecimal> solvedMatrix, int decimalNr, int integerNr, boolean flag) {
+        BigDecimal sum = new BigDecimal(0).setScale(decimalNr + integerNr, BigDecimal.ROUND_DOWN);
+        for (BigDecimal d : solvedMatrix)
+            sum = sum.add(d.abs());
+        if(flag)
+            System.out.println("Norma solutiei : " + trimDecimalNumber(decimalNr, sqrt(sum.doubleValue())));
+        else
+            System.out.println("Norma solutiei (inversa matricei): " + trimDecimalNumber(decimalNr, sqrt(sum.doubleValue())));
+        //System.out.println("Norma solutiei sqrt: "+ sqrt(sum, decimalNr));
     }
 
     private static double trimDecimalNumber(int decimalNr, double value) {
@@ -108,4 +127,48 @@ public class Utils {
         return Double.parseDouble(new DecimalFormat(format.toString()).format(value));
     }
 
+//    private static BigDecimal sqrt(BigDecimal x, int scale)
+//    {
+//        // Check that x >= 0.
+//        if (x.signum() < 0) {
+//            throw new IllegalArgumentException("x < 0");
+//        }
+//
+//        // n = x*(10^(2*scale))
+//        BigInteger n = x.movePointRight(scale << 1).toBigInteger();
+//
+//        // The first approximation is the upper half of n.
+//        int bits = (n.bitLength() + 1) >> 1;
+//        BigInteger ix = n.shiftRight(bits);
+//        BigInteger ixPrev;
+//
+//        // Loop until the approximations converge
+//        // (two successive approximations are equal after rounding).
+//        do {
+//            ixPrev = ix;
+//
+//            // x = (x + n/x)/2
+//            ix = ix.add(n.divide(ix)).shiftRight(1);
+//
+//            Thread.yield();
+//        } while (ix.compareTo(ixPrev) != 0);
+//
+//        return new BigDecimal(ix, scale);
+//    }
+
+    public static void calculateSecondNorm(Matrix solutionLib, List<Double> solution, int decimalNr) {
+        BigDecimal sum = new BigDecimal(0).setScale(decimalNr, RoundingMode.DOWN);
+        for (int i = 0; i < solution.size(); i++)
+            sum = sum.add(new BigDecimal(Math.abs(solution.get(i) - solutionLib.get(i, 0))).setScale(decimalNr,
+                    RoundingMode.DOWN));
+        System.out.println("Second Norm: " + trimDecimalNumber(decimalNr, Math.sqrt(sum.doubleValue())));
+    }
+
+    public static Matrix calculateSolLib(Matrix initialMatrix, List<Double> initialArray) {
+        LUDecomposition luDecomposition = new LUDecomposition(initialMatrix);
+        Matrix arrayMatrix = new Matrix(initialArray.size(), 1);
+        for (int i = 0; i < initialArray.size(); i++)
+            arrayMatrix.set(i, 0, initialArray.get(i));
+        return luDecomposition.solve(arrayMatrix);
+    }
 }
